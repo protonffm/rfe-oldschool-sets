@@ -1,4 +1,3 @@
-
 FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
@@ -75,7 +74,7 @@ CMD ["bash", "-c", "\
         -ar 44100 \
         -ac 2 \
         -f flv \
-        \"rtmp://live.twitch.tv/app/HIER_DEINEN_ZWEITEN_TWITCH_STREAM_KEY_EINTRAGEN\" \
+        \"rtmp://live.twitch.tv/app/live_1508232326_549kYQXQJHoFg89JbHbUTXfSVYRA4u\" \
         >> /tmp/ffmpeg.log 2>&1; \
       sleep 2; \
     done' & \
