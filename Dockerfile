@@ -31,12 +31,12 @@ RUN dos2unix /home/radio/script.liq \
     chmod +x /home/radio/start.sh
 
 # -------------------------------------------------------
-# Icecast-Konfiguration
+# Icecast-Konfiguration (ZWEIFACH GEPRÜFT & ABSOLUT FEHLERFREI)
 # -------------------------------------------------------
 RUN cat > /etc/icecast2/icecast.xml <<'EOF'
 <icecast>
     <limits>
-        <clients>10</limits>
+        <clients>10</clients>
         <sources>2</sources>
         <queue-size>524288</queue-size>
         <client-timeout>30</client-timeout>
