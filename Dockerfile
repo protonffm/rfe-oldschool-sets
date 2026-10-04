@@ -61,7 +61,7 @@ CMD ["bash", "-c", "\
         -ar 44100 \
         -ac 2 \
         -f flv \
-        \"rtmp://://youtube.com\"; \
+        \"rtmp://a.rtmp.youtube.com/live2/2t99-w0zu-mku7-6m0y-8qch"; \
       sleep 5; \
     done \
 "]
