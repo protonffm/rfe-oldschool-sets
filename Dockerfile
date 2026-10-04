@@ -7,41 +7,33 @@ RUN apt-get update && \
         tzdata \
         liquidsoap \
         ffmpeg \
-        icecast2 \
-        python3 \
         curl \
         dos2unix \
-        bash \
-        ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
+        coreutils \
+        python3 \
+        bash && \
+    rm -rf /var/lib/apt/lists/*
 
 # Zeitzone einrichten
 RUN ln -sf /usr/share/zoneinfo/Europe/Berlin /etc/localtime && \
     echo "Europe/Berlin" > /etc/timezone
 
-# Icecast für den automatischen Systemstart freischalten
-RUN sed -i 's/ENABLE=false/ENABLE=true/g' /etc/default/icecast2
-
 WORKDIR /home/radio
-RUN mkdir -p /home/radio/music
+RUN mkdir -p /home/radio/music /tmp/stream
 
 COPY . /home/radio/
 RUN dos2unix /home/radio/script.liq /home/radio/health.py
 
 EXPOSE 10000
 
-# Direktleitung im CMD-Block (Keine externen start.sh-Skripte mehr!)
+# Die unzerstörbare Direktleitung ohne Icecast-Sperren!
 CMD ["bash", "-c", "\
     python3 /home/radio/health.py & \
     \
-    service icecast2 start && \
-    \
-    sleep 3; \
-    \
+    echo '=== START LIQUIDSOAP AUDIO GENERATOR ==='; \
     liquidsoap /home/radio/script.liq & \
     \
-    sleep 8; \
-    \
+    echo '=== CODER REBUILD FIX: START FFMPEG ENCODER ==='; \
     while true; do \
       ffmpeg \
         -hide_banner \
@@ -49,8 +41,11 @@ CMD ["bash", "-c", "\
         -loop 1 \
         -framerate 25 \
         -i /home/radio/background.png \
-        -i http://127.0.0 \
-        -vf \"scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2,format=yuv420p\" \
+        -f s16le \
+        -ar 44100 \
+        -ac 2 \
+        -i /tmp/stream/live.raw \
+        -vf \"scale=1280:720,format=yuv420p\" \
         -c:v libx264 \
         -preset ultrafast \
         -tune zerolatency \
