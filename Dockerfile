@@ -29,12 +29,11 @@ CMD ["bash", "-c", "\
     echo '=== 1. STARTE HEALTH-CHECK DUMMY ==='; \
     python3 -m http.server 10000 --bind 0.0.0.0 --directory /home/radio & \
     \
-    echo '=== 2. STARTE LIQUIDSOAP HARBOR ENGINE ==='; \
+    echo '=== 2. STARTE LIQUIDSOAP ENGINE ==='; \
     liquidsoap /home/radio/script.liq & \
     \
-    echo '=== 3. WARTE AUF INTERNES NETZWERK-AUDIO ==='; \
-    while ! curl -s http://127.0.0 > /dev/null; do sleep 1; done; \
-    echo '-> Audio-Signal im RAM erkannt!'; \
+    echo '=== 3. WARTE AUF LIVE-AUDIO IM RAM ==='; \
+    sleep 8; \
     \
     echo '=== 4. STARTE FFMPEG YOUTUBE BROADCAST ==='; \
     ffmpeg \
