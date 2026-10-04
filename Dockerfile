@@ -15,12 +15,10 @@ RUN apt-get update && \
         ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# Zeitzone
 RUN ln -sf /usr/share/zoneinfo/Europe/Berlin /etc/localtime && \
     echo "Europe/Berlin" > /etc/timezone
 
 WORKDIR /home/radio
-
 RUN mkdir -p /home/radio/music
 
 COPY . /home/radio/
@@ -30,13 +28,11 @@ RUN dos2unix /home/radio/script.liq \
              /home/radio/health.py && \
     chmod +x /home/radio/start.sh
 
-# -------------------------------------------------------
-# Icecast-Konfiguration (ZWEIFACH GEPRÜFT & ABSOLUT FEHLERFREI)
-# -------------------------------------------------------
+# Icecast-Konfiguration mit dem korrekten Sicherheits-User 'icecast2'
 RUN cat > /etc/icecast2/icecast.xml <<'EOF'
 <icecast>
     <limits>
-        <clients>10</clients>
+        <clients>10</limits>
         <sources>2</sources>
         <queue-size>524288</queue-size>
         <client-timeout>30</client-timeout>
@@ -78,9 +74,16 @@ RUN cat > /etc/icecast2/icecast.xml <<'EOF'
 
     <security>
         <chroot>0</chroot>
+        <changeowner>
+            <user>icecast2</changeowner>
+            <group>icecast</group>
+        </changeowner>
     </security>
 </icecast>
 EOF
+
+# Wichtig: Dem Icecast-User die Rechte für die Log-Ordner geben
+RUN chown -R icecast2:icecast /etc/icecast2 /tmp
 
 EXPOSE 10000
 
