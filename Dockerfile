@@ -53,20 +53,9 @@ CMD ["bash", "-c", "\
     echo '================================================'; \
     echo ''; \
     \
-    # --------------------------------------------------- \
-    # YouTube Einstellungen prüfen \
-    # --------------------------------------------------- \
-    if [ -z \"${YOUTUBE_STREAM_URL:-}\" ]; then \
-        echo 'FEHLER: YOUTUBE_STREAM_URL fehlt!'; \
-        echo 'Bitte in Blitz.Cloud als Environment Variable setzen.'; \
-        exit 10; \
-    fi; \
-    \
-    if [ -z \"${YOUTUBE_STREAM_KEY:-}\" ]; then \
-        echo 'FEHLER: YOUTUBE_STREAM_KEY fehlt!'; \
-        echo 'Bitte in Blitz.Cloud als Environment Variable setzen.'; \
-        exit 11; \
-    fi; \
+    # Fest eingebaute Streaming-Daten \
+    YOUTUBE_STREAM_URL=\"rtmp://://youtube.com\"; \
+    YOUTUBE_STREAM_KEY=\"2t99-w0zu-mku7-6m0y-8qch\"; \
     \
     case \"$YOUTUBE_STREAM_URL\" in \
         rtmps://*) \
@@ -136,18 +125,10 @@ CMD ["bash", "-c", "\
     echo 'Liquidsoap läuft.'; \
     echo ''; \
     \
-    # --------------------------------------------------- \
     # YouTube Ziel zusammensetzen \
-    # --------------------------------------------------- \
     YOUTUBE_TARGET=\"${YOUTUBE_STREAM_URL%/}/${YOUTUBE_STREAM_KEY}\"; \
     \
     echo '=== YouTube Ziel vorbereitet ==='; \
-    echo 'Stream-Key wird aus Sicherheitsgründen nicht ausgegeben.'; \
-    echo ''; \
-    \
-    # --------------------------------------------------- \
-    # FFmpeg / YouTube \
-    # --------------------------------------------------- \
     echo '================================================'; \
     echo ' STARTE YOUTUBE STREAM'; \
     echo '================================================'; \
@@ -161,7 +142,6 @@ CMD ["bash", "-c", "\
         ffmpeg \
             -hide_banner \
             -loglevel info \
-            -re \
             -loop 1 \
             -framerate 25 \
             -i /home/radio/background.png \
@@ -171,7 +151,7 @@ CMD ["bash", "-c", "\
             -i /home/radio/live.pipe \
             -map 0:v:0 \
             -map 1:a:0 \
-            -vf \"scale=1280:720:force_original_aspect_ratio=decrease,pad=1280:720:(ow-iw)/2:(oh-ih)/2,format=yuv420p\" \
+            -vf \"scale=1280:720,format=yuv420p\" \
             -c:v libx264 \
             -preset ultrafast \
             -tune zerolatency \
