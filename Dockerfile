@@ -33,18 +33,18 @@ CMD ["bash", "-c", "\
     rm -f /home/radio/live.wav /home/radio/live.pipe; \
     mkfifo -m 666 /home/radio/live.pipe; \
     \
-    echo '=== RFE 2: Starting Health-Check Dummy on Port 10000 ==='; \
+    echo '=== RFE YOUTUBE: Starting Health-Check Dummy on Port 10000 ==='; \
     python3 -m http.server 10000 & \
     PYTHON_PID=$!; \
     \
     bash -c 'while true; do sleep 60; curl -s -I http://localhost:10000 > /dev/null; done' & \
     \
-    echo '=== RFE 2: Starting Liquidsoap Engine ==='; \
+    echo '=== RFE YOUTUBE: Starting Liquidsoap Engine ==='; \
     liquidsoap /home/radio/script.liq > /tmp/liquidsoap.log 2>&1 & \
     LIQ_PID=$!; \
     sleep 4; \
     \
-    echo '=== RFE 2: Starting Unstoppable FFmpeg Auto-Recovery Loop ==='; \
+    echo '=== RFE YOUTUBE: Starting Unstoppable FFmpeg YouTube Loop ==='; \
     bash -c '\
     while true; do \
       ffmpeg \
@@ -58,7 +58,7 @@ CMD ["bash", "-c", "\
         -ar 44100 \
         -ac 2 \
         -i /home/radio/live.pipe \
-        -vf \"scale=1024:576,format=yuv420p\" \
+        -vf \"scale=1280:720,format=yuv420p\" \
         -c:v libx264 \
         -preset ultrafast \
         -tune zerolatency \
@@ -67,15 +67,15 @@ CMD ["bash", "-c", "\
         -g 2 \
         -keyint_min 2 \
         -sc_threshold 0 \
-        -b:v 350k \
-        -maxrate 350k \
-        -bufsize 700k \
+        -b:v 400k \
+        -maxrate 400k \
+        -bufsize 800k \
         -c:a aac \
-        -b:a 64k \
+        -b:a 128k \
         -ar 44100 \
         -ac 2 \
         -f flv \
-        \"rtmp://live.twitch.tv/app/live_1508232326_n73baqSUfisJwOhI1rEnUwahIs6blF\" \
+        \"rtmp://://youtube.com\" \
         >> /tmp/ffmpeg.log 2>&1; \
       sleep 2; \
     done' & \
