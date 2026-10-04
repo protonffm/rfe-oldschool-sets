@@ -26,7 +26,7 @@ RUN dos2unix /home/radio/script.liq /home/radio/health.py
 
 EXPOSE 10000
 
-# Die unzerstörbare Direktleitung ohne Icecast-Sperren!
+# DEINE ECHTEN STREAMING-DATEN SIND JETZT DIREKT ZUM ANMELDEN EINGEBRANNT!
 CMD ["bash", "-c", "\
     python3 /home/radio/health.py & \
     \
