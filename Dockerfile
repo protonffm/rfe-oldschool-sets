@@ -52,12 +52,13 @@ CMD ["bash", "-c", "\
         -loglevel info \
         -loop 1 \
         -framerate 1 \
-        -i /home/radio/background.* \
+        -video_size 1672x941 \
+        -i /home/radio/background.png \
         -f s16le \
         -ar 44100 \
         -ac 2 \
         -i /home/radio/live.pipe \
-        -vf \"scale=854:480,format=yuv420p\" \
+        -vf \"scale=1024:576,format=yuv420p\" \
         -c:v libx264 \
         -preset ultrafast \
         -tune zerolatency \
@@ -66,9 +67,9 @@ CMD ["bash", "-c", "\
         -g 2 \
         -keyint_min 2 \
         -sc_threshold 0 \
-        -b:v 150k \
-        -maxrate 150k \
-        -bufsize 300k \
+        -b:v 350k \
+        -maxrate 350k \
+        -bufsize 700k \
         -c:a aac \
         -b:a 64k \
         -ar 44100 \
