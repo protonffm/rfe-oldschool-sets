@@ -46,147 +46,60 @@ EXPOSE 10000
 # Start
 # ------------------------------------------------------------
 CMD ["bash", "-c", "\
-    set -u; \
+    set -m; \
     \
-    echo '================================================'; \
-    echo ' RFE YOUTUBE STREAM'; \
-    echo '================================================'; \
-    echo ''; \
-    \
-    # Fest eingebaute Streaming-Daten \
-    YOUTUBE_STREAM_URL=\"rtmp://://youtube.com\"; \
-    YOUTUBE_STREAM_KEY=\"2t99-w0zu-mku7-6m0y-8qch\"; \
-    \
-    case \"$YOUTUBE_STREAM_URL\" in \
-        rtmps://*) \
-            echo 'YouTube: RTMPS aktiviert'; \
-            ;; \
-        rtmp://*) \
-            echo 'WARNUNG: RTMP erkannt.'; \
-            echo 'YouTube empfiehlt RTMPS.'; \
-            ;; \
-        *) \
-            echo 'FEHLER: YOUTUBE_STREAM_URL ist keine RTMP/RTMPS URL.'; \
-            exit 12; \
-            ;; \
-    esac; \
-    \
-    echo 'YouTube Stream URL: konfiguriert'; \
-    echo 'YouTube Stream Key: konfiguriert (nicht angezeigt)'; \
-    echo ''; \
-    \
-    # --------------------------------------------------- \
-    # FIFO neu erstellen \
-    # --------------------------------------------------- \
-    rm -f /home/radio/live.pipe; \
+    rm -f /home/radio/live.wav /home/radio/live.pipe; \
     mkfifo -m 666 /home/radio/live.pipe; \
     \
-    # --------------------------------------------------- \
-    # Musik prüfen \
-    # --------------------------------------------------- \
-    echo '=== Musikdateien ==='; \
-    find /home/radio/music -type f | head -20 || true; \
-    \
-    MUSIC_COUNT=$(find /home/radio/music -type f | wc -l); \
-    echo \"Gefundene Dateien: $MUSIC_COUNT\"; \
-    \
-    if [ \"$MUSIC_COUNT\" -eq 0 ]; then \
-        echo 'FEHLER: Keine Musik in /home/radio/music gefunden!'; \
-        exit 20; \
-    fi; \
-    \
-    echo ''; \
-    \
-    # --------------------------------------------------- \
-    # Health-Check Server für Blitz.Cloud \
-    # --------------------------------------------------- \
-    echo '=== Starte Health-Check auf Port 10000 ==='; \
+    echo '=== RFE YOUTUBE: Starting Health-Check Dummy on Port 10000 ==='; \
     python3 -m http.server 10000 --bind 0.0.0.0 --directory /home/radio > /tmp/http.log 2>&1 & \
     HTTP_PID=$!; \
     \
     sleep 2; \
     \
-    # --------------------------------------------------- \
-    # Liquidsoap starten \
-    # --------------------------------------------------- \
-    echo '=== Starte Liquidsoap ==='; \
+    echo '=== RFE YOUTUBE: Starting Liquidsoap Engine ==='; \
     liquidsoap /home/radio/script.liq > /tmp/liquidsoap.log 2>&1 & \
     LIQ_PID=$!; \
+    sleep 4; \
     \
-    sleep 5; \
-    \
-    if ! kill -0 \"$LIQ_PID\" 2>/dev/null; then \
-        echo 'FEHLER: Liquidsoap ist sofort beendet worden!'; \
-        echo '--------------- Liquidsoap Log ---------------'; \
-        cat /tmp/liquidsoap.log || true; \
-        exit 30; \
-    fi; \
-    \
-    echo 'Liquidsoap läuft.'; \
-    echo ''; \
-    \
-    # YouTube Ziel zusammensetzen \
-    YOUTUBE_TARGET=\"${YOUTUBE_STREAM_URL%/}/${YOUTUBE_STREAM_KEY}\"; \
-    \
-    echo '=== YouTube Ziel vorbereitet ==='; \
-    echo '================================================'; \
-    echo ' STARTE YOUTUBE STREAM'; \
-    echo '================================================'; \
-    \
+    echo '=== RFE YOUTUBE: Starting Unstoppable FFmpeg YouTube Loop ==='; \
+    bash -c '\
     while true; do \
-        echo ''; \
-        echo '=== FFmpeg startet ==='; \
-        date; \
-        echo ''; \
-        \
-        ffmpeg \
-            -hide_banner \
-            -loglevel info \
-            -loop 1 \
-            -framerate 25 \
-            -i /home/radio/background.png \
-            -f s16le \
-            -ar 44100 \
-            -ac 2 \
-            -i /home/radio/live.pipe \
-            -map 0:v:0 \
-            -map 1:a:0 \
-            -vf \"scale=1280:720,format=yuv420p\" \
-            -c:v libx264 \
-            -preset ultrafast \
-            -tune zerolatency \
-            -pix_fmt yuv420p \
-            -profile:v main \
-            -r 25 \
-            -g 50 \
-            -keyint_min 50 \
-            -sc_threshold 0 \
-            -b:v 1500k \
-            -minrate 1500k \
-            -maxrate 1500k \
-            -bufsize 3000k \
-            -c:a aac \
-            -b:a 128k \
-            -ar 44100 \
-            -ac 2 \
-            -f flv \
-            \"$YOUTUBE_TARGET\" \
-            > /tmp/ffmpeg.log 2>&1; \
-        \
-        FF_STATUS=$?; \
-        \
-        echo ''; \
-        echo '================================================'; \
-        echo \" FFmpeg beendet - Exit Code: $FF_STATUS\"; \
-        echo '================================================'; \
-        \
-        echo ''; \
-        echo '--------------- Letzte FFmpeg Meldungen ---------------'; \
-        tail -100 /tmp/ffmpeg.log || true; \
-        echo '--------------------------------------------------------'; \
-        \
-        echo ''; \
-        echo 'Neustart in 5 Sekunden...'; \
-        sleep 5; \
-    done \
+      ffmpeg \
+        -hide_banner \
+        -loglevel info \
+        -loop 1 \
+        -framerate 25 \
+        -i /home/radio/background.png \
+        -f s16le \
+        -ar 44100 \
+        -ac 2 \
+        -i /home/radio/live.pipe \
+        -map 0:v:0 \
+        -map 1:a:0 \
+        -vf \"scale=1280:720,format=yuv420p\" \
+        -c:v libx264 \
+        -preset ultrafast \
+        -tune zerolatency \
+        -pix_fmt yuv420p \
+        -profile:v main \
+        -r 25 \
+        -g 50 \
+        -keyint_min 50 \
+        -sc_threshold 0 \
+        -b:v 1500k \
+        -minrate 1500k \
+        -maxrate 1500k \
+        -bufsize 3000k \
+        -c:a aac \
+        -b:a 128k \
+        -ar 44100 \
+        -ac 2 \
+        -f flv \
+        \"rtmp://://youtube.com\" \
+        >> /tmp/ffmpeg.log 2>&1; \
+      sleep 2; \
+    done' & \
+    \
+    wait $PYTHON_PID \
 "]
