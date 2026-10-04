@@ -26,12 +26,5 @@ RUN dos2unix /home/radio/script.liq /home/radio/health.py
 
 EXPOSE 10000
 
-# Der gesamte Startbefehl als eine einzige, unzerstörbare Kette!
-CMD ["bash", "-c", "python3 /home/radio/health.py & echo '=== START LIQUIDSOAP AUDIO GENERATOR ==='; liquidsoap /home/radio/script.liq & echo '=== CODER REBUILD FIX: START FFMPEG ENCODER ==='; while true; do ffmpeg -hide_banner -loglevel info -loop 1 -framerate 25 -i /home/radio/background.png -f s16le -ar 44100 -ac 2 -i /tmp/stream/live.raw -vf 'scale=1280:720,format=yuv420p' -c:v libx264 -preset ultrafast -tune zerolatency -pix_fmt yuv420p -r 25 -g 50 -keyint_min 50 -b:v 1800k -maxrate 1800k -bufsize 3600k -c:a aac -b:a 128k -ar 44100 \
-        -ac 2 \
-        -f flv \
-        \"rtmp://a.rtmp.youtube.com/live2/2t99-w0zu-mku7-6m0y-8qch"; \
-      sleep 5; \
-    done \
-"]
-
+# Eine einzige, schnurgerade Zeile - Ersetze gleich händisch XXXXXXXXX und YYYYYYYYYY!
+CMD ["bash", "-c", "python3 /home/radio/health.py & echo '=== START LIQUIDSOAP AUDIO GENERATOR ==='; liquidsoap /home/radio/script.liq & echo '=== CODER REBUILD FIX: START FFMPEG ENCODER ==='; while true; do ffmpeg -hide_banner -loglevel info -loop 1 -framerate 25 -i /home/radio/background.png -f s16le -ar 44100 -ac 2 -i /tmp/stream/live.raw -vf 'scale=1280:720,format=yuv420p' -c:v libx264 -preset ultrafast -tune zerolatency -pix_fmt yuv420p -r 25 -g 50 -keyint_min 50 -b:v 1800k -maxrate 1800k -bufsize 3600k -c:a aac -b:a 128k -ar 44100 -ac 2 -f flv 'rtmp://a.rtmp.youtube.com/live2/2t99-w0zu-mku7-6m0y-8qch'; sleep 5; done"]
