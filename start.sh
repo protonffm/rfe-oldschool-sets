@@ -2,23 +2,23 @@
 set -u
 
 echo "=========================================="
-echo " RADIO STREAM STARTUP"
+echo " === CODER RESET FINAL STEP ==="
 echo "=========================================="
 
 echo "[1/4] Starting health server..."
 python3 /home/radio/health.py &
 
-echo "[2/4] Starting Icecast..."
-icecast2 -c /etc/icecast2/icecast.xml &
+echo "[2/4] Starting Icecast as user icecast2..."
+su -s /bin/bash -c "icecast2 -c /etc/icecast2/icecast.xml" icecast2 &
 
-sleep 3
+sleep 4
 
-echo "[3/4] Starting Liquidsoap..."
+echo "[3/4] Starting Liquidsoap Engine..."
 liquidsoap /home/radio/script.liq &
 
 sleep 8
 
-echo "[4/4] Starting YouTube encoder..."
+echo "[4/4] Starting Unstoppable FFmpeg Broadcast..."
 while true; do
     ffmpeg \
         -hide_banner \
