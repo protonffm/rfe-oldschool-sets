@@ -8,5 +8,5 @@ my_music = shuffle(my_music)
 my_music = crossfade(smart=true, duration=3.0, fade_out=2.5, fade_in=1.5, my_music)
 final_audio = mksafe(my_music)
 
-# Streaming direkt in das interne Netzwerk statt in eine verstopfte Pipe!
-output.harbor(%mp3(bitrate=128), port=8000, mount="live.mp3", final_audio)
+# Sendet die Musik als unzerstörbaren internen Icecast-Stream im RAM!
+output.icecast(%mp3(bitrate=128), host="127.0.0.1", port=8000, mount="live.mp3", password="x", final_audio)
