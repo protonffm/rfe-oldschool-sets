@@ -17,7 +17,7 @@ RUN apt-get update && \
 # Zeitzone einrichten
 RUN ln -sf /usr/share/zoneinfo/Europe/Berlin /etc/localtime && \
     echo "Europe/Berlin" > /etc/timezone
-
+ 
 WORKDIR /home/radio
 RUN mkdir -p /home/radio/music /tmp/stream
 
